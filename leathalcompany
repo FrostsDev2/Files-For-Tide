@@ -1,0 +1,613 @@
+html
+<!DOCTYPE html>
+<html lang="en-us">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+
+    <meta name="viewport"
+          content="width=device-width,
+                   height=device-height,
+                   initial-scale=1.0,
+                   user-scalable=no,
+                   shrink-to-fit=yes">
+
+    <title>Tide — Lethal Company</title>
+
+    <link rel="shortcut icon" href="./TemplateData/favicon.ico">
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+        html,
+        body {
+            margin: 0;
+            width: 100%;
+            height: 100%;
+            background: #050607;
+            overflow: hidden;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        #unity-container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            background: #050607;
+        }
+
+        #unity-canvas {
+            width: 100%;
+            height: 100%;
+            display: block;
+            outline: none;
+            background: #050607;
+        }
+
+
+        /* =========================================
+           LOADING SCREEN
+        ========================================= */
+
+        #tide-loading {
+            position: absolute;
+            inset: 0;
+
+            z-index: 50;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            background:
+                radial-gradient(
+                    ellipse at center,
+                    #10161b 0%,
+                    #070a0d 42%,
+                    #030405 100%
+                );
+
+            opacity: 1;
+            visibility: visible;
+
+            transition:
+                opacity 0.7s ease,
+                visibility 0.7s ease;
+        }
+
+        #tide-loading.hidden {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
+
+
+        /* =========================================
+           SUBTLE BACKGROUND
+        ========================================= */
+
+        .background-glow {
+            position: absolute;
+
+            width: 700px;
+            height: 700px;
+
+            left: 50%;
+            top: 50%;
+
+            transform: translate(-50%, -50%);
+
+            border-radius: 50%;
+
+            background:
+                radial-gradient(
+                    circle,
+                    rgba(161, 220, 255, 0.055) 0%,
+                    rgba(161, 220, 255, 0.018) 35%,
+                    transparent 70%
+                );
+
+            pointer-events: none;
+        }
+
+
+        /* =========================================
+           MAIN
+        ========================================= */
+
+        .loader {
+            position: relative;
+
+            width: 360px;
+
+            text-align: center;
+        }
+
+
+        /* =========================================
+           TIDE
+        ========================================= */
+
+        .logo {
+            margin-bottom: 42px;
+
+            color: #ffffff;
+
+            font-size: 58px;
+
+            font-weight: 700;
+
+            letter-spacing: -4px;
+
+            line-height: 1;
+
+            user-select: none;
+        }
+
+        .logo span {
+            color: #a1dcff;
+        }
+
+
+        /* =========================================
+           GAME TITLE
+        ========================================= */
+
+        .game-title {
+            color: rgba(255,255,255,0.9);
+
+            font-size: 15px;
+
+            font-weight: 500;
+
+            letter-spacing: 0.2px;
+
+            margin-bottom: 7px;
+        }
+
+        .game-version {
+            color: rgba(255,255,255,0.3);
+
+            font-size: 10px;
+
+            letter-spacing: 1px;
+
+            text-transform: uppercase;
+
+            margin-bottom: 35px;
+        }
+
+
+        /* =========================================
+           PROGRESS
+        ========================================= */
+
+        .progress-info {
+            display: flex;
+
+            justify-content: space-between;
+
+            align-items: center;
+
+            margin-bottom: 9px;
+
+            font-size: 10px;
+
+            letter-spacing: 0.4px;
+        }
+
+        #status {
+            color: rgba(255,255,255,0.42);
+        }
+
+        #percent {
+            color: rgba(161,220,255,0.8);
+        }
+
+
+        .progress {
+            width: 100%;
+
+            height: 2px;
+
+            background:
+                rgba(255,255,255,0.09);
+
+            overflow: hidden;
+        }
+
+
+        #progress {
+            width: 0%;
+
+            height: 100%;
+
+            background: #a1dcff;
+
+            box-shadow:
+                0 0 12px rgba(161,220,255,0.65);
+
+            transition:
+                width 0.15s linear;
+        }
+
+
+        /* =========================================
+           FOOTER
+        ========================================= */
+
+        .footer {
+            margin-top: 28px;
+
+            color:
+                rgba(255,255,255,0.2);
+
+            font-size: 9px;
+
+            letter-spacing: 1.5px;
+
+            text-transform: uppercase;
+        }
+
+
+        /* =========================================
+           WARNING
+        ========================================= */
+
+        #unity-warning {
+            position: absolute;
+
+            top: 20px;
+            left: 50%;
+
+            transform: translateX(-50%);
+
+            width: min(600px, 90vw);
+
+            z-index: 100;
+
+            color: white;
+
+            text-align: center;
+
+            font-size: 12px;
+        }
+
+        #unity-warning div {
+            padding: 9px 12px;
+
+            margin-bottom: 5px;
+
+            border-radius: 5px;
+
+            background: rgba(210,45,45,0.9);
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+<div id="unity-container">
+
+    <canvas id="unity-canvas" tabindex="-1"></canvas>
+
+
+    <div id="tide-loading">
+
+        <div class="background-glow"></div>
+
+
+        <div class="loader">
+
+            <div class="logo">
+                Tid<span>e</span>
+            </div>
+
+
+            <div class="game-title">
+                Lethal Company
+            </div>
+
+
+            <div class="game-version">
+                Web Edition
+            </div>
+
+
+            <div class="progress-info">
+
+                <span id="status">
+                    Initializing
+                </span>
+
+                <span id="percent">
+                    0%
+                </span>
+
+            </div>
+
+
+            <div class="progress">
+
+                <div id="progress"></div>
+
+            </div>
+
+
+            <div class="footer">
+                Powered by Tide
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <div id="unity-warning"></div>
+
+</div>
+
+
+<script>
+
+/* =========================================
+   WISP RELAY
+========================================= */
+
+window.WispRelayWSState = {
+    sock: null,
+    recvPtr: 0,
+    sid: 0
+};
+
+
+/* =========================================
+   ELEMENTS
+========================================= */
+
+const canvas =
+    document.getElementById("unity-canvas");
+
+const loading =
+    document.getElementById("tide-loading");
+
+const progress =
+    document.getElementById("progress");
+
+const percent =
+    document.getElementById("percent");
+
+const status =
+    document.getElementById("status");
+
+const warning =
+    document.getElementById("unity-warning");
+
+
+/* =========================================
+   WARNING
+========================================= */
+
+function unityShowBanner(message, type) {
+
+    const div =
+        document.createElement("div");
+
+    div.textContent = message;
+
+    warning.appendChild(div);
+
+    if (type !== "error") {
+
+        setTimeout(() => {
+
+            if (div.parentNode)
+                div.remove();
+
+        }, 5000);
+
+    }
+}
+
+
+/* =========================================
+   LOCAL BUILD
+========================================= */
+
+const buildUrl = "./Build";
+
+
+const config = {
+
+    dataUrl:
+        buildUrl + "/build.data",
+
+    frameworkUrl:
+        buildUrl + "/build.framework.js",
+
+    codeUrl:
+        buildUrl + "/build.wasm",
+
+    streamingAssetsUrl:
+        "./StreamingAssets",
+
+    companyName:
+        "ZeekerssRBLX",
+
+    productName:
+        "Lethal Company",
+
+    productVersion:
+        "0.1",
+
+    showBanner:
+        unityShowBanner,
+
+    webglContextAttributes: {
+
+        antialias: false,
+
+        preserveDrawingBuffer: true,
+
+        powerPreference:
+            "high-performance",
+
+        failIfMajorPerformanceCaveat:
+            false
+    }
+};
+
+
+/* =========================================
+   MOBILE
+========================================= */
+
+if (
+    /iPhone|iPad|iPod|Android/i
+        .test(navigator.userAgent)
+) {
+
+    canvas.className =
+        "unity-mobile";
+}
+
+
+/* =========================================
+   LOAD UNITY
+========================================= */
+
+const script =
+    document.createElement("script");
+
+script.src =
+    "./Build/build.loader.js";
+
+
+script.onload = function () {
+
+    status.textContent =
+        "Loading game";
+
+
+    createUnityInstance(
+
+        canvas,
+
+        config,
+
+        function (value) {
+
+            const p =
+                Math.round(value * 100);
+
+
+            progress.style.width =
+                p + "%";
+
+
+            percent.textContent =
+                p + "%";
+
+
+            if (p < 20) {
+
+                status.textContent =
+                    "Loading files";
+
+            } else if (p < 50) {
+
+                status.textContent =
+                    "Loading game";
+
+            } else if (p < 80) {
+
+                status.textContent =
+                    "Loading assets";
+
+            } else if (p < 100) {
+
+                status.textContent =
+                    "Starting";
+
+            } else {
+
+                status.textContent =
+                    "Ready";
+            }
+
+        }
+
+    )
+
+    .then(function (unityInstance) {
+
+        progress.style.width =
+            "100%";
+
+        percent.textContent =
+            "100%";
+
+        status.textContent =
+            "Ready";
+
+
+        setTimeout(function () {
+
+            loading.classList.add(
+                "hidden"
+            );
+
+        }, 300);
+
+
+        canvas.focus();
+
+    })
+
+    .catch(function (error) {
+
+        console.error(
+            "[Tide]",
+            error
+        );
+
+        status.textContent =
+            "Failed to load";
+
+        unityShowBanner(
+            error,
+            "error"
+        );
+
+    });
+
+};
+
+
+script.onerror = function () {
+
+    status.textContent =
+        "Loader unavailable";
+
+    unityShowBanner(
+        "Could not load Unity loader.",
+        "error"
+    );
+
+};
+
+
+document.body.appendChild(script);
+
+</script>
+
+</body>
+
+</html>
