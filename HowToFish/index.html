@@ -1,0 +1,1364 @@
+html
+<!DOCTYPE html>
+<html lang="en-us">
+
+<head>
+<meta charset="utf-8">
+
+<meta http-equiv="Content-Type"
+      content="text/html; charset=utf-8">
+
+<meta name="viewport"
+      content="width=device-width,
+               height=device-height,
+               initial-scale=1.0,
+               user-scalable=no,
+               shrink-to-fit=yes">
+
+<title>How to Fish</title>
+
+<style>
+
+* {
+    box-sizing: border-box;
+}
+
+html,
+body {
+
+    width: 100%;
+    height: 100%;
+
+    margin: 0;
+    padding: 0;
+
+    overflow: hidden;
+
+    background: #05080a;
+
+    font-family:
+        Inter,
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        Arial,
+        sans-serif;
+}
+
+
+/* =========================================================
+   UNITY
+========================================================= */
+
+#unity-container {
+
+    position: absolute;
+
+    inset: 0;
+
+    width: 100%;
+    height: 100%;
+
+    background: #05080a;
+}
+
+
+#unity-canvas {
+
+    display: block;
+
+    width: 100%;
+    height: 100%;
+
+    background: #05080a;
+
+    outline: none;
+}
+
+
+/* =========================================================
+   LOADING SCREEN
+========================================================= */
+
+#unity-loading-screen {
+
+    position: absolute;
+
+    inset: 0;
+
+    z-index: 20;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    overflow: hidden;
+
+    background:
+
+        radial-gradient(
+            circle at 50% 42%,
+            rgba(46, 117, 150, 0.16),
+            transparent 32%
+        ),
+
+        linear-gradient(
+            180deg,
+            #071014 0%,
+            #05090c 55%,
+            #030506 100%
+        );
+
+    transition:
+        opacity 0.7s ease,
+        visibility 0.7s ease;
+}
+
+
+#unity-loading-screen.hidden {
+
+    opacity: 0;
+
+    visibility: hidden;
+
+    pointer-events: none;
+}
+
+
+/* =========================================================
+   WATER / LIGHT EFFECT
+========================================================= */
+
+.water-light {
+
+    position: absolute;
+
+    width: 900px;
+    height: 900px;
+
+    left: 50%;
+    top: 50%;
+
+    transform:
+        translate(-50%, -50%);
+
+    border-radius: 50%;
+
+    background:
+
+        radial-gradient(
+            circle,
+            rgba(67, 170, 210, 0.09),
+            rgba(67, 170, 210, 0.025) 35%,
+            transparent 70%
+        );
+
+    animation:
+        breathe 7s ease-in-out infinite alternate;
+
+    pointer-events: none;
+}
+
+
+@keyframes breathe {
+
+    from {
+        transform:
+            translate(-50%, -50%)
+            scale(0.9);
+
+        opacity: 0.55;
+    }
+
+    to {
+        transform:
+            translate(-50%, -50%)
+            scale(1.08);
+
+        opacity: 1;
+    }
+}
+
+
+/* =========================================================
+   CONTENT
+========================================================= */
+
+.loader-content {
+
+    position: relative;
+
+    width: min(430px, 82vw);
+
+    text-align: center;
+}
+
+
+/* =========================================================
+   GAME LOGO
+========================================================= */
+
+.game-logo {
+
+    margin-bottom: 14px;
+
+    color: #f4f8fa;
+
+    font-size: clamp(38px, 6vw, 58px);
+
+    font-weight: 700;
+
+    letter-spacing: -2.8px;
+
+    line-height: 1;
+
+    text-shadow:
+        0 8px 35px rgba(0,0,0,0.4);
+}
+
+
+.game-logo .fish {
+
+    color: #65c9ed;
+
+    text-shadow:
+        0 0 30px rgba(72,190,230,0.2);
+}
+
+
+/* =========================================================
+   SUBTITLE
+========================================================= */
+
+.subtitle {
+
+    margin-bottom: 52px;
+
+    color:
+        rgba(255,255,255,0.38);
+
+    font-size: 10px;
+
+    font-weight: 500;
+
+    letter-spacing: 3px;
+
+    text-transform: uppercase;
+}
+
+
+/* =========================================================
+   LOADING AREA
+========================================================= */
+
+.loading-top {
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    margin-bottom: 10px;
+
+    font-size: 10px;
+
+    letter-spacing: 0.4px;
+}
+
+
+#unity-status {
+
+    color:
+        rgba(255,255,255,0.45);
+
+    text-align: left;
+
+    white-space: nowrap;
+
+    overflow: hidden;
+
+    text-overflow: ellipsis;
+}
+
+
+#unity-percent {
+
+    color:
+        rgba(101,201,237,0.85);
+
+    font-variant-numeric:
+        tabular-nums;
+}
+
+
+/* =========================================================
+   PROGRESS BAR
+========================================================= */
+
+#unity-progress-bar-empty {
+
+    position: relative;
+
+    width: 100%;
+
+    height: 2px;
+
+    overflow: hidden;
+
+    background:
+        rgba(255,255,255,0.10);
+}
+
+
+#unity-progress-bar-full {
+
+    width: 0%;
+
+    height: 100%;
+
+    background:
+        linear-gradient(
+            90deg,
+            #329dc4,
+            #72d4f4
+        );
+
+    box-shadow:
+        0 0 14px
+        rgba(90,202,239,0.55);
+
+    transition:
+        width 0.15s linear;
+}
+
+
+/* =========================================================
+   FOOTER
+========================================================= */
+
+.footer {
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    gap: 7px;
+
+    margin-top: 23px;
+
+    color:
+        rgba(255,255,255,0.22);
+
+    font-size: 9px;
+
+    letter-spacing: 1.4px;
+
+    text-transform: uppercase;
+}
+
+
+.footer-dot {
+
+    width: 4px;
+    height: 4px;
+
+    border-radius: 50%;
+
+    background: #62c9ed;
+
+    box-shadow:
+        0 0 7px
+        rgba(98,201,237,0.65);
+
+    animation:
+        pulse 1.5s ease-in-out infinite;
+}
+
+
+@keyframes pulse {
+
+    0%,
+    100% {
+        opacity: .35;
+    }
+
+    50% {
+        opacity: 1;
+    }
+}
+
+
+/* =========================================================
+   WARNING
+========================================================= */
+
+#unity-warning {
+
+    position: absolute;
+
+    top: 18px;
+
+    left: 50%;
+
+    transform:
+        translateX(-50%);
+
+    z-index: 100;
+
+    width: min(600px, 90vw);
+
+    color: #e6b45d;
+
+    font-size: 11px;
+
+    text-align: center;
+}
+
+
+/* =========================================================
+   ERROR
+========================================================= */
+
+#unity-error {
+
+    position: absolute;
+
+    top: 50%;
+    left: 50%;
+
+    transform:
+        translate(-50%, -50%);
+
+    z-index: 100;
+
+    display: none;
+
+    width: min(500px, 85vw);
+
+    padding: 20px;
+
+    border:
+        1px solid rgba(255,80,80,0.15);
+
+    border-radius: 8px;
+
+    background:
+        rgba(12,8,9,0.92);
+
+    color:
+        #e98282;
+
+    font-size: 12px;
+
+    line-height: 1.6;
+
+    text-align: center;
+}
+
+</style>
+
+</head>
+
+
+<body>
+
+
+<div id="unity-container">
+
+    <canvas
+        id="unity-canvas"
+        tabindex="-1">
+    </canvas>
+
+
+    <!-- =====================================================
+         LOADING SCREEN
+    ====================================================== -->
+
+    <div id="unity-loading-screen">
+
+        <div class="water-light"></div>
+
+
+        <div class="loader-content">
+
+
+            <div class="game-logo">
+
+                How to
+                <span class="fish">Fish</span>
+
+            </div>
+
+
+            <div class="subtitle">
+
+                A fishing adventure
+
+            </div>
+
+
+            <div class="loading-top">
+
+                <span id="unity-status">
+                    Initializing
+                </span>
+
+                <span id="unity-percent">
+                    0%
+                </span>
+
+            </div>
+
+
+            <div id="unity-progress-bar-empty">
+
+                <div id="unity-progress-bar-full"></div>
+
+            </div>
+
+
+            <div class="footer">
+
+                <span class="footer-dot"></span>
+
+                <span>
+                    Preparing game
+                </span>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <div id="unity-warning"></div>
+
+    <div id="unity-error"></div>
+
+</div>
+
+
+<script>
+
+
+/* =========================================================
+   ELEMENTS
+========================================================= */
+
+var container =
+    document.querySelector("#unity-container");
+
+var canvas =
+    document.querySelector("#unity-canvas");
+
+var loadingScreen =
+    document.querySelector("#unity-loading-screen");
+
+var loadingBar =
+    document.querySelector("#unity-progress-bar-full");
+
+var statusText =
+    document.querySelector("#unity-status");
+
+var percentText =
+    document.querySelector("#unity-percent");
+
+var warningBanner =
+    document.querySelector("#unity-warning");
+
+var errorBox =
+    document.querySelector("#unity-error");
+
+
+/* =========================================================
+   ERROR
+========================================================= */
+
+function showError(message) {
+
+    errorBox.style.display = "block";
+
+    errorBox.innerHTML =
+        "<strong>Unable to start the game</strong><br><br>" +
+        message;
+}
+
+
+/* =========================================================
+   UNITY WARNINGS
+========================================================= */
+
+function unityShowBanner(message, type) {
+
+    console.warn(
+        "[Unity " + (type || "info") + "]",
+        message
+    );
+}
+
+
+/* =========================================================
+   LOCAL / REPOSITORY FILES
+========================================================= */
+
+var repoBase =
+    "https://cdn.jsdelivr.net/gh/NotRexed/HowToFishPort@main/";
+
+var buildUrl =
+    repoBase + "Build";
+
+var loaderUrl =
+    buildUrl + "/WebGL.loader.js";
+
+var frameworkUrl =
+    buildUrl + "/WebGL.framework.js";
+
+var dataUrl =
+    buildUrl + "/WebGL.data";
+
+var wasmUrl =
+    buildUrl + "/WebGL.wasm";
+
+
+var MAX_PARTS = 128;
+
+var objectUrls = [];
+
+
+/* =========================================================
+   HELPERS
+========================================================= */
+
+function basename(url) {
+
+    return url
+        .split("/")
+        .pop();
+}
+
+
+/* =========================================================
+   CHECK FILE SIZE
+========================================================= */
+
+async function probeSize(url) {
+
+    try {
+
+        var head =
+            await fetch(
+                url,
+                {
+                    method: "HEAD"
+                }
+            );
+
+
+        if (head.ok) {
+
+            var len =
+                parseInt(
+                    head.headers.get(
+                        "content-length"
+                    ) || "0",
+                    10
+                );
+
+            return isNaN(len)
+                ? 0
+                : len;
+        }
+
+
+        if (head.status === 404) {
+
+            return -1;
+        }
+
+    } catch (e) {}
+
+
+    try {
+
+        var response =
+            await fetch(
+                url,
+                {
+                    headers: {
+                        Range: "bytes=0-0"
+                    }
+                }
+            );
+
+
+        if (
+            !response.ok &&
+            response.status !== 206
+        ) {
+
+            return -1;
+        }
+
+
+        var contentRange =
+            response.headers.get(
+                "content-range"
+            );
+
+
+        if (
+            contentRange &&
+            contentRange.indexOf("/") !== -1
+        ) {
+
+            var total =
+                parseInt(
+                    contentRange
+                        .split("/")[1],
+                    10
+                );
+
+
+            if (!isNaN(total)) {
+
+                return total;
+            }
+        }
+
+
+        return 0;
+
+    } catch (e) {
+
+        return -1;
+    }
+}
+
+
+/* =========================================================
+   DISCOVER SPLIT FILES
+========================================================= */
+
+async function discoverParts(url) {
+
+    var schemes = [
+
+        function (i) {
+            return url +
+                ".part" +
+                (i + 1);
+        },
+
+        function (i) {
+            return url +
+                "." +
+                String(i)
+                    .padStart(3, "0");
+        },
+
+        function (i) {
+            return url +
+                ".part" +
+                String(i + 1)
+                    .padStart(3, "0");
+        }
+    ];
+
+
+    for (
+        var s = 0;
+        s < schemes.length;
+        s++
+    ) {
+
+        var naming =
+            schemes[s];
+
+
+        var first =
+            await probeSize(
+                naming(0)
+            );
+
+
+        if (first < 0)
+            continue;
+
+
+        var parts = [
+
+            {
+                url:
+                    naming(0),
+
+                size:
+                    first
+            }
+
+        ];
+
+
+        for (
+            var i = 1;
+            i < MAX_PARTS;
+            i++
+        ) {
+
+            var size =
+                await probeSize(
+                    naming(i)
+                );
+
+
+            if (size < 0)
+                break;
+
+
+            parts.push({
+
+                url:
+                    naming(i),
+
+                size:
+                    size
+
+            });
+        }
+
+
+        return parts;
+    }
+
+
+    return [];
+}
+
+
+/* =========================================================
+   DOWNLOAD PART
+========================================================= */
+
+async function fetchPartBlob(
+    url,
+    onBytes
+) {
+
+    var response =
+        await fetch(url);
+
+
+    if (!response.ok) {
+
+        throw new Error(
+            "Failed to fetch " +
+            url +
+            " (HTTP " +
+            response.status +
+            ")"
+        );
+    }
+
+
+    if (
+        !response.body ||
+        !response.body.getReader
+    ) {
+
+        var buffer =
+            await response.arrayBuffer();
+
+
+        onBytes(
+            buffer.byteLength
+        );
+
+
+        return new Blob([
+            buffer
+        ]);
+    }
+
+
+    var reader =
+        response.body.getReader();
+
+
+    var chunks = [];
+
+
+    while (true) {
+
+        var step =
+            await reader.read();
+
+
+        if (step.done)
+            break;
+
+
+        chunks.push(
+            step.value
+        );
+
+
+        onBytes(
+            step.value.length
+        );
+    }
+
+
+    return new Blob(chunks);
+}
+
+
+/* =========================================================
+   RESOLVE FILE
+========================================================= */
+
+async function resolveUrl(
+    url,
+    mimeType,
+    plan,
+    onBytes,
+    onFile
+) {
+
+    var parts =
+        plan[url];
+
+
+    if (
+        !parts ||
+        !parts.length
+    ) {
+
+        return url;
+    }
+
+
+    var blobs = [];
+
+
+    for (
+        var i = 0;
+        i < parts.length;
+        i++
+    ) {
+
+        onFile(
+            basename(
+                parts[i].url
+            )
+        );
+
+
+        blobs.push(
+            await fetchPartBlob(
+                parts[i].url,
+                onBytes
+            )
+        );
+    }
+
+
+    var objectUrl =
+        URL.createObjectURL(
+
+            new Blob(
+                blobs,
+                {
+                    type:
+                        mimeType
+                }
+            )
+        );
+
+
+    objectUrls.push(
+        objectUrl
+    );
+
+
+    return objectUrl;
+}
+
+
+/* =========================================================
+   LOAD SCRIPT AS BLOB
+========================================================= */
+
+async function fetchAsScriptBlob(url) {
+
+    statusText.textContent =
+        basename(url);
+
+
+    var response =
+        await fetch(url);
+
+
+    if (!response.ok) {
+
+        throw new Error(
+            "Failed to fetch " +
+            url +
+            " (HTTP " +
+            response.status +
+            ")"
+        );
+    }
+
+
+    var text =
+        await response.text();
+
+
+    var objectUrl =
+        URL.createObjectURL(
+
+            new Blob(
+                [text],
+                {
+                    type:
+                        "text/javascript"
+                }
+            )
+        );
+
+
+    objectUrls.push(
+        objectUrl
+    );
+
+
+    return objectUrl;
+}
+
+
+/* =========================================================
+   START GAME
+========================================================= */
+
+async function boot() {
+
+    statusText.textContent =
+        "Checking files...";
+
+
+    var plan = {};
+
+
+    plan[dataUrl] =
+        await discoverParts(
+            dataUrl
+        );
+
+
+    plan[wasmUrl] =
+        await discoverParts(
+            wasmUrl
+        );
+
+
+    if (
+        !plan[dataUrl].length &&
+        (await probeSize(dataUrl)) < 0
+    ) {
+
+        throw new Error(
+            "WebGL.data could not be found."
+        );
+    }
+
+
+    if (
+        !plan[wasmUrl].length &&
+        (await probeSize(wasmUrl)) < 0
+    ) {
+
+        throw new Error(
+            "WebGL.wasm could not be found."
+        );
+    }
+
+
+    var totalBytes = 0;
+
+
+    Object.keys(plan).forEach(
+        function (key) {
+
+            plan[key].forEach(
+                function (part) {
+
+                    totalBytes +=
+                        part.size;
+                }
+            );
+
+        }
+    );
+
+
+    var loadedBytes = 0;
+
+    var currentFile = "";
+
+
+    function onBytes(amount) {
+
+        loadedBytes += amount;
+
+
+        if (totalBytes > 0) {
+
+            var fraction =
+                Math.min(
+                    loadedBytes /
+                    totalBytes,
+                    1
+                );
+
+
+            loadingBar.style.width =
+                (fraction * 90) + "%";
+
+
+            percentText.textContent =
+                Math.round(
+                    fraction * 100
+                ) + "%";
+        }
+    }
+
+
+    function onFile(name) {
+
+        currentFile = name;
+
+        statusText.textContent =
+            "Loading " + name;
+    }
+
+
+    statusText.textContent =
+        "Loading game files";
+
+
+    /*
+     * Download sequentially so the browser
+     * doesn't choke on multiple large files.
+     */
+
+    var resolvedWasm =
+        await resolveUrl(
+            wasmUrl,
+            "application/wasm",
+            plan,
+            onBytes,
+            onFile
+        );
+
+
+    var resolvedData =
+        await resolveUrl(
+            dataUrl,
+            "application/octet-stream",
+            plan,
+            onBytes,
+            onFile
+        );
+
+
+    var resolvedLoader =
+        await fetchAsScriptBlob(
+            loaderUrl
+        );
+
+
+    var resolvedFramework =
+        await fetchAsScriptBlob(
+            frameworkUrl
+        );
+
+
+    statusText.textContent =
+        "Starting game";
+
+
+    var config = {
+
+        dataUrl:
+            resolvedData,
+
+        frameworkUrl:
+            resolvedFramework,
+
+        codeUrl:
+            resolvedWasm,
+
+        streamingAssetsUrl:
+            repoBase +
+            "StreamingAssets",
+
+        companyName:
+            "DefaultCompany",
+
+        productName:
+            "How to Fish",
+
+        productVersion:
+            "1.0",
+
+        showBanner:
+            unityShowBanner,
+
+        autoSyncPersistentDataPath:
+            true
+    };
+
+
+    if (
+        /iPhone|iPad|iPod|Android/i
+            .test(
+                navigator.userAgent
+            )
+    ) {
+
+        container.className =
+            "unity-mobile";
+
+        canvas.className =
+            "unity-mobile";
+    }
+
+
+    await new Promise(
+        function (resolve, reject) {
+
+            var script =
+                document.createElement(
+                    "script"
+                );
+
+
+            script.src =
+                resolvedLoader;
+
+
+            script.onload =
+                resolve;
+
+
+            script.onerror =
+                function () {
+
+                    reject(
+                        new Error(
+                            "Failed to load Unity loader."
+                        )
+                    );
+                };
+
+
+            document.body.appendChild(
+                script
+            );
+        }
+    );
+
+
+    var unityInstance =
+        await createUnityInstance(
+
+            canvas,
+
+            config,
+
+            function (progress) {
+
+                loadingBar.style.width =
+                    (90 +
+                    progress * 10) +
+                    "%";
+
+
+                percentText.textContent =
+                    Math.round(
+                        progress * 10 +
+                        90
+                    ) + "%";
+
+
+                statusText.textContent =
+                    progress < 0.5
+                        ? "Starting game"
+                        : "Almost ready";
+            }
+        );
+
+
+    window.unityInstance =
+        unityInstance;
+
+
+    loadingBar.style.width =
+        "100%";
+
+
+    percentText.textContent =
+        "100%";
+
+
+    statusText.textContent =
+        "Ready";
+
+
+    setTimeout(
+        function () {
+
+            loadingScreen.classList.add(
+                "hidden"
+            );
+
+        },
+        350
+    );
+
+
+    canvas.focus();
+}
+
+
+/* =========================================================
+   BOOT
+========================================================= */
+
+boot().catch(
+    function (error) {
+
+        console.error(
+            "[How to Fish]",
+            error
+        );
+
+
+        showError(
+            error &&
+            error.message
+                ? error.message
+                : error
+        );
+    }
+);
+
+</script>
+
+</body>
+</html>
