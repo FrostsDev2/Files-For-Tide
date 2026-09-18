@@ -1,613 +1,825 @@
-html
 <!DOCTYPE html>
 <html lang="en-us">
-
 <head>
-    <meta charset="utf-8">
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-
-    <meta name="viewport"
-          content="width=device-width,
-                   height=device-height,
-                   initial-scale=1.0,
-                   user-scalable=no,
-                   shrink-to-fit=yes">
-
-    <title>Tide — Lethal Company</title>
-
-    <link rel="shortcut icon" href="./TemplateData/favicon.ico">
-
-    <style>
-
-        * {
-            box-sizing: border-box;
-        }
+  <meta charset="utf-8">
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+
+  <title>Lethal Company Web</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: #050505;
+      font-family:
+        Inter,
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        sans-serif;
+    }
+
+    #unity-container {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background:
+        radial-gradient(
+          circle at 50% 45%,
+          rgba(80, 80, 70, 0.08),
+          transparent 45%
+        ),
+        #050505;
+    }
+
+    #unity-canvas {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      display: block;
+      background: #231f20;
+      outline: none;
+    }
+
+    /* ------------------------------
+       LOADING SCREEN
+    ------------------------------ */
+
+    #loading-screen {
+      position: absolute;
+      inset: 0;
+      z-index: 20;
+
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      background:
+        radial-gradient(
+          ellipse at center,
+          rgba(50, 50, 45, 0.12) 0%,
+          rgba(5, 5, 5, 0.95) 70%
+        ),
+        #050505;
+
+      transition:
+        opacity 0.5s ease,
+        visibility 0.5s ease;
+    }
+
+    #loading-screen.hidden {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+
+    /* subtle scanlines */
+    #loading-screen::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+
+      background:
+        repeating-linear-gradient(
+          to bottom,
+          rgba(255,255,255,0.018) 0px,
+          rgba(255,255,255,0.018) 1px,
+          transparent 1px,
+          transparent 4px
+        );
+
+      opacity: 0.35;
+    }
 
-        html,
-        body {
-            margin: 0;
-            width: 100%;
-            height: 100%;
-            background: #050607;
-            overflow: hidden;
-            font-family: Arial, Helvetica, sans-serif;
-        }
+    /* subtle vignette */
+    #loading-screen::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
 
-        #unity-container {
-            position: relative;
-            width: 100%;
-            height: 100%;
-            background: #050607;
-        }
+      background:
+        radial-gradient(
+          ellipse at center,
+          transparent 35%,
+          rgba(0,0,0,0.75) 100%
+        );
+    }
 
-        #unity-canvas {
-            width: 100%;
-            height: 100%;
-            display: block;
-            outline: none;
-            background: #050607;
-        }
+    .loading-content {
+      position: relative;
+      z-index: 2;
 
+      width: min(440px, calc(100vw - 48px));
 
-        /* =========================================
-           LOADING SCREEN
-        ========================================= */
+      display: flex;
+      flex-direction: column;
+      align-items: center;
 
-        #tide-loading {
-            position: absolute;
-            inset: 0;
+      color: #e8e8e8;
+    }
 
-            z-index: 50;
+    /* ------------------------------
+       LOGO
+    ------------------------------ */
 
-            display: flex;
-            align-items: center;
-            justify-content: center;
+    .game-logo {
+      text-align: center;
+      margin-bottom: 42px;
 
-            background:
-                radial-gradient(
-                    ellipse at center,
-                    #10161b 0%,
-                    #070a0d 42%,
-                    #030405 100%
-                );
+      animation: logoFade 0.8s ease forwards;
+    }
 
-            opacity: 1;
-            visibility: visible;
+    .game-logo .small {
+      display: block;
 
-            transition:
-                opacity 0.7s ease,
-                visibility 0.7s ease;
-        }
+      margin-bottom: 7px;
 
-        #tide-loading.hidden {
-            opacity: 0;
-            visibility: hidden;
-            pointer-events: none;
-        }
+      color: #888;
 
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 5px;
+      text-transform: uppercase;
+    }
 
-        /* =========================================
-           SUBTLE BACKGROUND
-        ========================================= */
+    .game-logo .title {
+      display: block;
 
-        .background-glow {
-            position: absolute;
+      color: #f1f1f1;
 
-            width: 700px;
-            height: 700px;
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: clamp(30px, 6vw, 46px);
+      font-weight: 700;
+      letter-spacing: -1px;
+      line-height: 1;
+    }
 
-            left: 50%;
-            top: 50%;
+    .game-logo .subtitle {
+      display: block;
 
-            transform: translate(-50%, -50%);
+      margin-top: 9px;
 
-            border-radius: 50%;
+      color: #666;
 
-            background:
-                radial-gradient(
-                    circle,
-                    rgba(161, 220, 255, 0.055) 0%,
-                    rgba(161, 220, 255, 0.018) 35%,
-                    transparent 70%
-                );
+      font-size: 10px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+    }
 
-            pointer-events: none;
-        }
+    /* ------------------------------
+       LOADING INFO
+    ------------------------------ */
 
+    .loading-info {
+      width: 100%;
+    }
 
-        /* =========================================
-           MAIN
-        ========================================= */
+    .loading-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
 
-        .loader {
-            position: relative;
+      margin-bottom: 10px;
 
-            width: 360px;
+      color: #777;
 
-            text-align: center;
-        }
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+    }
 
+    #unity-status-text {
+      color: #aaa;
+    }
 
-        /* =========================================
-           TIDE
-        ========================================= */
+    #loading-percent {
+      color: #777;
+      font-variant-numeric: tabular-nums;
+    }
 
-        .logo {
-            margin-bottom: 42px;
+    /* progress track */
+    #unity-progress-bar-empty {
+      position: relative;
 
-            color: #ffffff;
+      width: 100%;
+      height: 3px;
 
-            font-size: 58px;
+      overflow: hidden;
 
-            font-weight: 700;
+      background: #202020;
+    }
 
-            letter-spacing: -4px;
+    #unity-progress-bar-full {
+      width: 0%;
+      height: 100%;
 
-            line-height: 1;
+      background: #d8d8d8;
 
-            user-select: none;
-        }
+      transition: width 0.2s ease;
+      box-shadow: 0 0 10px rgba(255,255,255,0.15);
+    }
 
-        .logo span {
-            color: #a1dcff;
-        }
+    .loading-bottom {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
 
+      margin-top: 13px;
 
-        /* =========================================
-           GAME TITLE
-        ========================================= */
+      color: #444;
 
-        .game-title {
-            color: rgba(255,255,255,0.9);
+      font-size: 9px;
+      letter-spacing: 1.2px;
+      text-transform: uppercase;
+    }
 
-            font-size: 15px;
+    .loading-bottom-left {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+    }
 
-            font-weight: 500;
+    .status-dot {
+      width: 5px;
+      height: 5px;
 
-            letter-spacing: 0.2px;
+      border-radius: 50%;
 
-            margin-bottom: 7px;
-        }
+      background: #aaa;
 
-        .game-version {
-            color: rgba(255,255,255,0.3);
+      box-shadow: 0 0 8px rgba(255,255,255,0.25);
 
-            font-size: 10px;
+      animation: pulse 1.4s ease-in-out infinite;
+    }
 
-            letter-spacing: 1px;
+    /* ------------------------------
+       WARNING / ERROR
+    ------------------------------ */
 
-            text-transform: uppercase;
+    #unity-warning {
+      position: absolute;
+      z-index: 50;
 
-            margin-bottom: 35px;
-        }
+      left: 50%;
+      top: 28px;
 
+      transform: translateX(-50%);
 
-        /* =========================================
-           PROGRESS
-        ========================================= */
+      width: min(600px, calc(100vw - 32px));
 
-        .progress-info {
-            display: flex;
+      display: none;
 
-            justify-content: space-between;
+      overflow: hidden;
 
-            align-items: center;
+      background: rgba(12, 12, 12, 0.96);
+      border: 1px solid #333;
 
-            margin-bottom: 9px;
+      color: #ddd;
 
-            font-size: 10px;
+      font-size: 12px;
+      line-height: 1.5;
 
-            letter-spacing: 0.4px;
-        }
+      box-shadow: 0 15px 50px rgba(0,0,0,0.5);
+    }
 
-        #status {
-            color: rgba(255,255,255,0.42);
-        }
+    .warning-content {
+      padding: 13px 15px;
+    }
 
-        #percent {
-            color: rgba(161,220,255,0.8);
-        }
+    .warning-error {
+      border-color: #5a3030;
+    }
 
+    /* ------------------------------
+       ANIMATIONS
+    ------------------------------ */
 
-        .progress {
-            width: 100%;
+    @keyframes logoFade {
+      from {
+        opacity: 0;
+        transform: translateY(8px);
+      }
 
-            height: 2px;
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
 
-            background:
-                rgba(255,255,255,0.09);
+    @keyframes pulse {
+      0%,
+      100% {
+        opacity: 0.35;
+        transform: scale(0.8);
+      }
 
-            overflow: hidden;
-        }
+      50% {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
 
+    /* ------------------------------
+       MOBILE
+    ------------------------------ */
 
-        #progress {
-            width: 0%;
+    @media (max-width: 600px) {
+      .game-logo {
+        margin-bottom: 32px;
+      }
 
-            height: 100%;
+      .game-logo .title {
+        font-size: 34px;
+      }
 
-            background: #a1dcff;
-
-            box-shadow:
-                0 0 12px rgba(161,220,255,0.65);
-
-            transition:
-                width 0.15s linear;
-        }
-
-
-        /* =========================================
-           FOOTER
-        ========================================= */
-
-        .footer {
-            margin-top: 28px;
-
-            color:
-                rgba(255,255,255,0.2);
-
-            font-size: 9px;
-
-            letter-spacing: 1.5px;
-
-            text-transform: uppercase;
-        }
-
-
-        /* =========================================
-           WARNING
-        ========================================= */
-
-        #unity-warning {
-            position: absolute;
-
-            top: 20px;
-            left: 50%;
-
-            transform: translateX(-50%);
-
-            width: min(600px, 90vw);
-
-            z-index: 100;
-
-            color: white;
-
-            text-align: center;
-
-            font-size: 12px;
-        }
-
-        #unity-warning div {
-            padding: 9px 12px;
-
-            margin-bottom: 5px;
-
-            border-radius: 5px;
-
-            background: rgba(210,45,45,0.9);
-        }
-
-    </style>
-
+      .loading-content {
+        width: calc(100vw - 40px);
+      }
+    }
+  </style>
 </head>
-
 
 <body>
 
-<div id="unity-container">
+  <div id="unity-container">
 
     <canvas id="unity-canvas" tabindex="-1"></canvas>
 
+    <!-- Loading UI -->
+    <div id="loading-screen">
 
-    <div id="tide-loading">
+      <div class="loading-content">
 
-        <div class="background-glow"></div>
+        <div class="game-logo">
+          <span class="small">ZeekerssRBLX presents</span>
+          <span class="title">Lethal Company</span>
+          <span class="subtitle">Web Edition</span>
+        </div>
 
+        <div class="loading-info">
 
-        <div class="loader">
+          <div class="loading-top">
+            <span id="unity-status-text">Initializing...</span>
+            <span id="loading-percent">0%</span>
+          </div>
 
-            <div class="logo">
-                Tid<span>e</span>
+          <div id="unity-progress-bar-empty">
+            <div id="unity-progress-bar-full"></div>
+          </div>
+
+          <div class="loading-bottom">
+            <div class="loading-bottom-left">
+              <span class="status-dot"></span>
+              <span>System Online</span>
             </div>
 
-
-            <div class="game-title">
-                Lethal Company
-            </div>
-
-
-            <div class="game-version">
-                Web Edition
-            </div>
-
-
-            <div class="progress-info">
-
-                <span id="status">
-                    Initializing
-                </span>
-
-                <span id="percent">
-                    0%
-                </span>
-
-            </div>
-
-
-            <div class="progress">
-
-                <div id="progress"></div>
-
-            </div>
-
-
-            <div class="footer">
-                Powered by Tide
-            </div>
+            <span>v0.1</span>
+          </div>
 
         </div>
 
-    </div>
+      </div>
 
+    </div>
 
     <div id="unity-warning"></div>
 
-</div>
+  </div>
+
+  <script>
+    window.WispRelayWSState = {
+      sock: null,
+      recvPtr: 0,
+      sid: 0
+    };
+  </script>
+
+  <script>
+    var container = document.querySelector("#unity-container");
+    var canvas = document.querySelector("#unity-canvas");
+
+    var loadingScreen = document.querySelector("#loading-screen");
+    var progressBarFull = document.querySelector("#unity-progress-bar-full");
+    var statusText = document.querySelector("#unity-status-text");
+    var loadingPercent = document.querySelector("#loading-percent");
+    var warningBanner = document.querySelector("#unity-warning");
 
 
-<script>
+    /* --------------------------------
+       UNITY BANNER
+    -------------------------------- */
 
-/* =========================================
-   WISP RELAY
-========================================= */
+    function unityShowBanner(msg, type) {
 
-window.WispRelayWSState = {
-    sock: null,
-    recvPtr: 0,
-    sid: 0
-};
+      warningBanner.innerHTML = "";
 
+      var div = document.createElement("div");
+      div.className = "warning-content";
+      div.textContent = msg;
 
-/* =========================================
-   ELEMENTS
-========================================= */
+      warningBanner.appendChild(div);
 
-const canvas =
-    document.getElementById("unity-canvas");
+      warningBanner.className =
+        type === "error"
+          ? "warning-error"
+          : "";
 
-const loading =
-    document.getElementById("tide-loading");
+      warningBanner.style.display = "block";
 
-const progress =
-    document.getElementById("progress");
-
-const percent =
-    document.getElementById("percent");
-
-const status =
-    document.getElementById("status");
-
-const warning =
-    document.getElementById("unity-warning");
-
-
-/* =========================================
-   WARNING
-========================================= */
-
-function unityShowBanner(message, type) {
-
-    const div =
-        document.createElement("div");
-
-    div.textContent = message;
-
-    warning.appendChild(div);
-
-    if (type !== "error") {
-
-        setTimeout(() => {
-
-            if (div.parentNode)
-                div.remove();
-
+      if (type !== "error") {
+        setTimeout(function () {
+          warningBanner.style.display = "none";
         }, 5000);
+      }
+    }
+
+
+    /* --------------------------------
+       GITHUB / JSDELIVR
+    -------------------------------- */
+
+    var GH_USER = "larpinguser";
+    var GH_REPO = "lethal";
+    var GH_BRANCH = "main";
+    var GH_PATH = "build/Build";
+
+    var JSDELIVR_BASE =
+      "https://cdn.jsdelivr.net/gh/" +
+      GH_USER +
+      "/" +
+      GH_REPO +
+      "@" +
+      GH_BRANCH +
+      "/" +
+      GH_PATH;
+
+
+    /* --------------------------------
+       SPLIT FILE CONFIG
+    -------------------------------- */
+
+    var DATA_PART_COUNT = 18;
+    var WASM_PART_COUNT = 5;
+
+
+    function padded(n) {
+      return n < 10 ? "0" + n : "" + n;
+    }
+
+
+    var dataPartUrls = [];
+
+    for (var i = 1; i <= DATA_PART_COUNT; i++) {
+
+      dataPartUrls.push(
+        JSDELIVR_BASE +
+        "/build.data.part" +
+        padded(i)
+      );
 
     }
-}
 
 
-/* =========================================
-   LOCAL BUILD
-========================================= */
+    var wasmPartUrls = [];
 
-const buildUrl = "./Build";
+    for (var j = 1; j <= WASM_PART_COUNT; j++) {
+
+      wasmPartUrls.push(
+        JSDELIVR_BASE +
+        "/build.wasm.part" +
+        j
+      );
+
+    }
 
 
-const config = {
+    var frameworkUrl =
+      JSDELIVR_BASE +
+      "/build.framework.js";
 
-    dataUrl:
-        buildUrl + "/build.data",
+    var loaderUrl =
+      JSDELIVR_BASE +
+      "/build.loader.js";
 
-    frameworkUrl:
-        buildUrl + "/build.framework.js",
+    var streamingAssetsUrl =
+      JSDELIVR_BASE.replace(/\/Build$/, "") +
+      "/StreamingAssets";
 
-    codeUrl:
-        buildUrl + "/build.wasm",
 
-    streamingAssetsUrl:
-        "./StreamingAssets",
+    /* --------------------------------
+       UNITY CONFIG
+    -------------------------------- */
 
-    companyName:
-        "ZeekerssRBLX",
+    var config = {
 
-    productName:
-        "Lethal Company",
+      dataUrl: null,
 
-    productVersion:
-        "0.1",
+      frameworkUrl: frameworkUrl,
 
-    showBanner:
-        unityShowBanner,
+      codeUrl: null,
 
-    webglContextAttributes: {
+      streamingAssetsUrl: streamingAssetsUrl,
+
+      companyName: "ZeekerssRBLX",
+
+      productName: "Lethal Company",
+
+      productVersion: "0.1",
+
+      showBanner: unityShowBanner,
+
+      webglContextAttributes: {
 
         antialias: false,
 
         preserveDrawingBuffer: true,
 
-        powerPreference:
-            "high-performance",
+        powerPreference: "high-performance",
 
-        failIfMajorPerformanceCaveat:
-            false
+        failIfMajorPerformanceCaveat: false
+
+      }
+
+    };
+
+
+    /* --------------------------------
+       MOBILE
+    -------------------------------- */
+
+    if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
+
+      var meta = document.createElement("meta");
+
+      meta.name = "viewport";
+
+      meta.content =
+        "width=device-width, height=device-height, " +
+        "initial-scale=1.0, user-scalable=no, " +
+        "shrink-to-fit=yes";
+
+      document
+        .getElementsByTagName("head")[0]
+        .appendChild(meta);
+
+      container.className = "unity-mobile";
+
+      canvas.className = "unity-mobile";
     }
-};
 
 
-/* =========================================
-   MOBILE
-========================================= */
+    /* --------------------------------
+       PROGRESS
+    -------------------------------- */
 
-if (
-    /iPhone|iPad|iPod|Android/i
-        .test(navigator.userAgent)
-) {
+    function setProgress(percent, message) {
 
-    canvas.className =
-        "unity-mobile";
-}
+      percent = Math.max(0, Math.min(100, percent));
 
+      progressBarFull.style.width =
+        percent + "%";
 
-/* =========================================
-   LOAD UNITY
-========================================= */
+      loadingPercent.textContent =
+        Math.round(percent) + "%";
 
-const script =
-    document.createElement("script");
-
-script.src =
-    "./Build/build.loader.js";
+      if (message) {
+        statusText.textContent = message;
+      }
+    }
 
 
-script.onload = function () {
+    /* --------------------------------
+       DOWNLOAD
+    -------------------------------- */
 
-    status.textContent =
-        "Loading game";
+    async function fetchPart(url) {
 
+      var res = await fetch(url);
 
-    createUnityInstance(
+      if (!res.ok) {
 
-        canvas,
+        throw new Error(
+          "Failed to fetch " +
+          url +
+          " (HTTP " +
+          res.status +
+          ")"
+        );
 
-        config,
+      }
 
-        function (value) {
-
-            const p =
-                Math.round(value * 100);
-
-
-            progress.style.width =
-                p + "%";
-
-
-            percent.textContent =
-                p + "%";
+      return res.arrayBuffer();
+    }
 
 
-            if (p < 20) {
+    async function reassemble(urls, onEachDone) {
 
-                status.textContent =
-                    "Loading files";
+      var buffers = [];
 
-            } else if (p < 50) {
+      for (var k = 0; k < urls.length; k++) {
 
-                status.textContent =
-                    "Loading game";
+        buffers.push(
+          await fetchPart(urls[k])
+        );
 
-            } else if (p < 80) {
+        onEachDone();
+      }
 
-                status.textContent =
-                    "Loading assets";
+      return new Blob(buffers);
+    }
 
-            } else if (p < 100) {
 
-                status.textContent =
-                    "Starting";
+    /* --------------------------------
+       LOAD UNITY LOADER
+    -------------------------------- */
 
-            } else {
+    function loadScript(src) {
 
-                status.textContent =
-                    "Ready";
-            }
+      return new Promise(function(resolve, reject) {
+
+        var s = document.createElement("script");
+
+        s.src = src;
+
+        s.onload = resolve;
+
+        s.onerror = function() {
+
+          reject(
+            new Error(
+              "Failed to load Unity loader"
+            )
+          );
+
+        };
+
+        document.body.appendChild(s);
+
+      });
+
+    }
+
+
+    /* --------------------------------
+       START
+    -------------------------------- */
+
+    (async function main() {
+
+      try {
+
+        var totalParts =
+          dataPartUrls.length +
+          wasmPartUrls.length;
+
+        var partsDone = 0;
+
+
+        function bumpDownloadProgress() {
+
+          partsDone++;
+
+          var pct =
+            (partsDone / totalParts) * 80;
+
+          setProgress(
+            pct,
+            "Downloading game files"
+          );
+
+          statusText.textContent =
+            "Downloading game files " +
+            "(" +
+            partsDone +
+            "/" +
+            totalParts +
+            ")";
 
         }
 
-    )
 
-    .then(function (unityInstance) {
-
-        progress.style.width =
-            "100%";
-
-        percent.textContent =
-            "100%";
-
-        status.textContent =
-            "Ready";
+        setProgress(
+          0,
+          "Preparing game files"
+        );
 
 
-        setTimeout(function () {
+        /* DATA */
 
-            loading.classList.add(
-                "hidden"
-            );
+        statusText.textContent =
+          "Downloading game data";
+
+        var dataBlob =
+          await reassemble(
+            dataPartUrls,
+            bumpDownloadProgress
+          );
+
+
+        /* WASM */
+
+        statusText.textContent =
+          "Downloading game engine";
+
+        var wasmBlob =
+          await reassemble(
+            wasmPartUrls,
+            bumpDownloadProgress
+          );
+
+
+        /* OBJECT URLS */
+
+        config.dataUrl =
+          URL.createObjectURL(dataBlob);
+
+        config.codeUrl =
+          URL.createObjectURL(wasmBlob);
+
+
+        /* UNITY LOADER */
+
+        setProgress(
+          82,
+          "Starting Unity engine"
+        );
+
+        await loadScript(loaderUrl);
+
+
+        /* UNITY INSTANCE */
+
+        statusText.textContent =
+          "Loading engine";
+
+
+        var unityInstance =
+          await createUnityInstance(
+            canvas,
+            config,
+            function(progress) {
+
+              var pct =
+                80 +
+                progress * 20;
+
+              setProgress(
+                pct,
+                "Loading engine"
+              );
+
+            }
+          );
+
+
+        /* FINISHED */
+
+        setProgress(
+          100,
+          "Ready"
+        );
+
+        setTimeout(function() {
+
+          loadingScreen.classList.add(
+            "hidden"
+          );
+
+          canvas.focus();
 
         }, 300);
 
 
-        canvas.focus();
+      } catch (err) {
 
-    })
+        console.error(err);
 
-    .catch(function (error) {
-
-        console.error(
-            "[Tide]",
-            error
-        );
-
-        status.textContent =
-            "Failed to load";
+        statusText.textContent =
+          "Failed to load";
 
         unityShowBanner(
-            error,
-            "error"
+          err.message || String(err),
+          "error"
         );
 
-    });
+      }
 
-};
-
-
-script.onerror = function () {
-
-    status.textContent =
-        "Loader unavailable";
-
-    unityShowBanner(
-        "Could not load Unity loader.",
-        "error"
-    );
-
-};
-
-
-document.body.appendChild(script);
-
-</script>
+    })();
+  </script>
 
 </body>
-
 </html>
